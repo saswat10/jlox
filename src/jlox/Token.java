@@ -1,3 +1,5 @@
+package jlox;
+
 class Token {
     final TokenType type;
     final String lexeme;
