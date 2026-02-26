@@ -1,18 +1,25 @@
 package jlox;
 
 import javax.management.RuntimeErrorException;
+import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-    void interpret(Expr expressions) {
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expressions);
-            System.out.println(stringify(value));
+            for(Stmt statement: statements) {
+               execute(statement);
+            }
+            // Object value = evaluate(expressions);
+            // System.out.println(stringify(value));
         }catch (RuntimeError error) {
             Jlox.runtimeError(error);
         }
     }
 
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
+    }
 
 
     @Override
@@ -123,4 +130,16 @@ class Interpreter implements Expr.Visitor<Object> {
         return object.toString();
     }
 
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
 }
